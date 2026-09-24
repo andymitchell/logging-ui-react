@@ -1,6 +1,6 @@
 {
     "name": "@andymitchell/logging-ui-react",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "React components for browsing traces recorded with @andymitchell/logging",
     "repository": {
         "type": "git",
