@@ -74,12 +74,16 @@ type FilterProviderProps = PropsWithChildren<{
  * Holds the shared search state that the filter controls in {@link TraceFilter} edit, and combines them into one trace filter.
  *
  * Each control writes its own part (message, levels, time range, full text); the provider ANDs them together.
+ * Components inside it read the combined query with {@link useFilterQuery}, e.g. to feed a `TraceSearch`.
  * Until initialisation completes (see `initializedCriteria`), the combined entries filter stays empty, so the
  * filter doesn't change once per control as the controls mount.
  *
  * @example
+ * const Results = () => <TraceSearch tracesSource={viewer} query={useFilterQuery()} />;
+ *
  * <FilterProvider initializedCriteria={{ type: 'debounce' }}>
  *     <TraceFilter />
+ *     <Results />
  * </FilterProvider>
  */
 export const FilterProvider: FC<FilterProviderProps> = ({
@@ -183,3 +187,30 @@ export const useFilterContext = <T extends Record<string, any> = Record<string, 
     if (!context) throw new Error("useFilterContext must be used within a FilterProvider");
     return context;
 };
+
+/**
+ * Read the trace query built by the filter controls of the enclosing {@link FilterProvider}.
+ *
+ * Pass it to `TraceSearch` (or your own `getTraces` call) to lay out the filter controls and the results
+ * yourself: the search then re-runs whenever a control changes the filter.
+ *
+ * @returns The combined query, as a `TraceFilter` from `@andymitchell/logging/get-traces`. It is the same object
+ * until a filter changes, so it is safe to use as a dependency or to pass straight to `TraceSearch`.
+ *
+ * @example
+ * const Results = ({ viewer }: { viewer: TraceViewer }) => (
+ *     <TraceSearch tracesSource={viewer} query={useFilterQuery()} />
+ * );
+ *
+ * <FilterProvider>
+ *     <TraceFilter />
+ *     <Results viewer={viewer} />
+ * </FilterProvider>
+ *
+ * @remarks
+ * Must be called in a component rendered inside a `FilterProvider`; it throws otherwise.
+ *
+ * While no control has a value, and until the provider finishes initialising (see its `initializedCriteria`), the
+ * query filters nothing: a search returns every trace but marks no entry as a match, so `TraceSearch` lists nothing.
+ */
+export const useFilterQuery = (): TraceFilter => useFilterContext().traceFilter;

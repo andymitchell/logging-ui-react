@@ -32,7 +32,33 @@ export const Traces = () => <TraceInspector tracesSource={viewer} template="neut
 
 `tracesSource` is either a `TraceViewer` or a function with the same signature as `TraceViewer.getTraces` (`GetTracesFn`), e.g. one that fetches traces from a server.
 
-Exports: `TraceInspector` (search + list + detail, all in one), `TraceView` (one trace as a span tree), `TraceSearch` / `TraceSearchResultsList` (run a search / render matching entries), `TraceFilter` + `FilterProvider` (the filter controls), and the types `TracesSource`, `GetTracesFn`, `BaseComponentTypes`.
+Exports: `TraceInspector` (search + list + detail, all in one), `TraceView` (one trace as a span tree), `TraceSearch` / `TraceSearchResultsList` (run a search / render matching entries), `TraceFilter` + `FilterProvider` + `useFilterQuery` (the filter controls and the query they build), and the types `TracesSource`, `GetTracesFn`, `BaseComponentTypes`.
+
+### Your own layout
+
+To place the filter controls and the results yourself, wrap both in a `FilterProvider` and feed the controls' query to `TraceSearch` with `useFilterQuery`. The search re-runs whenever a control changes:
+
+```tsx
+import { useState } from 'react';
+import { FilterProvider, TraceFilter, TraceSearch, useFilterQuery, TraceView } from '@andymitchell/logging-ui-react';
+
+const Results = ({ onOpen }: { onOpen: (traceId: string) => void }) => (
+    <TraceSearch tracesSource={viewer} query={useFilterQuery()} onClick={onOpen} />
+);
+
+export const Traces = () => {
+    const [traceId, setTraceId] = useState<string>();
+    return (
+        <FilterProvider>
+            <header><TraceFilter /></header>
+            <aside><Results onOpen={setTraceId} /></aside>
+            <main>{traceId && <TraceView tracesSource={viewer} traceId={traceId} />}</main>
+        </FilterProvider>
+    );
+};
+```
+
+`useFilterQuery` must be called from a component inside the `FilterProvider` (here `Results`), not from the one rendering it. The search lists nothing until a control has a value.
 
 ## Requirements
 

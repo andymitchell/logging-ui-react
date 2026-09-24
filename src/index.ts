@@ -1,4 +1,4 @@
-import { FilterProvider } from "./trace/filter-bar/FilterContext.tsx";
+import { FilterProvider, useFilterQuery } from "./trace/filter-bar/FilterContext.tsx";
 import { TraceFilter } from "./trace/filter-bar/TraceFilter.tsx";
 import { TraceSearch } from "./trace/search/TraceSearch.tsx";
 import { TraceSearchResultsList } from "./trace/search/TraceSearchResultsList.tsx";
@@ -17,6 +17,7 @@ export {
     TraceView,
     TraceFilter,
     FilterProvider,
+    useFilterQuery,
     TraceSearch,
     TraceSearchResultsList
 }

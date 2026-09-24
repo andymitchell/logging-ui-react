@@ -2,7 +2,7 @@
 import type { FC } from "react";
 import type { TracesSource } from "../types.ts";
 
-import { useFilterContext } from "../filter-bar/FilterContext.tsx";
+import { useFilterQuery } from "../filter-bar/FilterContext.tsx";
 import { TraceSearch } from "./TraceSearch.tsx";
 
 
@@ -20,7 +20,7 @@ export const FilterContextTraceSearch: FC<FilterContextTraceSearchProps> = ({
     onClick
 }) => {
 
-    const {traceFilter} = useFilterContext();
+    const traceFilter = useFilterQuery();
 
 
     return (
