@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
+        "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
+        "verbatimModuleSyntax": true,
+        "noUnusedLocals": true,
+        "allowSyntheticDefaultImports": true,
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "jsx": "react-jsx",
+        // Dependencies' published .d.ts files aren't ours to fix: @andymitchell/utils (reached through logging's
+        // types) references the `chrome` namespace without declaring @types/chrome.
+        "skipLibCheck": true,
+        "lib": [
+            "ESNext",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        // The runner's globals (`describe`, `it`, `expect`) come from vitest, matching `globals: true` in
+        // vitest.config.ts. Naming the global type packages explicitly stops TS auto-including every @types/*
+        // package in node_modules.
+        "types": [
+            "vitest/globals"
+        ]
+    },
+    "include": [
+        "./src"
+    ]
+}

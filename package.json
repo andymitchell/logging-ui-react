@@ -1,0 +1,63 @@
+{
+    "name": "@andymitchell/logging-ui-react",
+    "version": "0.0.0",
+    "description": "React components for browsing traces recorded with @andymitchell/logging",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/andymitchell/logging-ui-react.git"
+    },
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "type": "module",
+    "files": [
+        "dist",
+        "README.MD",
+        "LICENSE"
+    ],
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com",
+        "access": "public"
+    },
+    "scripts": {
+        "build_release": "npm run build_prepare && np",
+        "build": "tsup",
+        "pkglint": "./build/publint_pipeable.sh",
+        "assert-no-devdep-leak": "node build/assert-no-devdep-leak.mjs",
+        "build_prepare": "npm run build && npm run assert-no-devdep-leak && rm -f dist/metafile-*.json && npm run pkglint",
+        "prepublishOnly": "npm run build_prepare",
+        "test": "vitest",
+        "test:watch": "vitest --watch",
+        "typecheck": "tsc --noEmit"
+    },
+    "author": "",
+    "license": "MIT",
+    "engines": {
+        "node": ">=19.0.0"
+    },
+    "devDependencies": {
+        "@andymitchell/logging": "^0.13.0",
+        "@types/node": "^22.20.4",
+        "@types/react": "^19.0.12",
+        "@types/react-dom": "^19.0.4",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
+        "react-json-view-lite": "^2.4.1",
+        "tsup": "^8.5.0",
+        "typescript": "^5.8.3",
+        "vitest": "^3.2.4",
+        "zod": "^4.1.8"
+    },
+    "peerDependencies": {
+        "@andymitchell/logging": ">=0.13.0 <1.0.0",
+        "react": "^18.3.1 || ^19.0.0",
+        "react-json-view-lite": "^2.4.1"
+    },
+    "dependencies": {
+        "@andymitchell/objects": "^1.26.0"
+    }
+}
