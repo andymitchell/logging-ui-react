@@ -2,6 +2,7 @@ import { MemoryLogStorage, Trace } from "@andymitchell/logging";
 import { TraceViewer, type TraceFilter } from "@andymitchell/logging/get-traces";
 import type { GetTracesFn } from "../types.ts";
 import { getTracesFromSource } from "./getTracesFromSource.ts";
+import { UNREADABLE_SOURCE, viewerWithAnUnreadableSource } from "../../testing/unreadableSource.ts";
 
 /**
  * Intent: every component accepts either a `TraceViewer` or a plain function as its traces source, and must show
@@ -54,6 +55,18 @@ describe('loading traces from a source', () => {
 
             expect(fromViewer.traces.map(trace => trace.logs[0]?.message)).toEqual(['Checkout']);
             expect(fromViewer.traces[0]?.matches.map(entry => entry.message)).toEqual(['Card declined']);
+            expect(fromFunction).toEqual(fromViewer);
+        });
+
+        it('passes a partial answer through: the traces that could be read, and the source that could not', async () => {
+            const viewer = await viewerWithAnUnreadableSource();
+
+            const fromViewer = await getTracesFromSource(viewer);
+            const fromFunction = await getTracesFromSource(asFunctionSource(viewer));
+
+            expect(fromViewer.ok).toBe(false);
+            expect(fromViewer.traces.map(trace => trace.logs[0]?.message)).toEqual(['Checkout']);
+            expect(fromViewer.error?.failures.map(failure => failure.source)).toEqual([UNREADABLE_SOURCE]);
             expect(fromFunction).toEqual(fromViewer);
         });
     });

@@ -9,6 +9,7 @@ import type { TracesSource } from "../types.ts";
 
 import { useTrace } from "../data/useTraceResults.ts";
 import { LogBody } from "../common-components/LogBody.tsx";
+import { SourceFailures } from "../common-components/SourceFailures.tsx";
 
 
 type TraceViewProps = BaseComponentTypes & {
@@ -27,7 +28,9 @@ type OnClickLog = (id:string) => void;
 /**
  * Show one trace as a collapsible tree of spans and their logs; click any line to inspect the full entry as JSON.
  *
- * Child spans and logs are indented under their parent span in the order they were recorded.
+ * Child spans and logs are indented under their parent span in the order they were recorded. When some log
+ * sources could not be read, it shows the entries the others returned and names the ones that failed; when a
+ * function source throws or rejects, it shows the error's message.
  *
  * @example
  * <TraceView traceId={traceId} tracesSource={new TraceViewer(storage)} />
@@ -64,6 +67,8 @@ export const TraceView: FC<TraceViewProps> = (props) => {
 
     return (
         <div ref={props.ref} className={props.className} style={props.style} data-container='trace-viewer' data-trace-id={data.trace?.id}>
+            {data.error && <div data-container='load-error'>Error: {data.error.message}</div>}
+            <SourceFailures error={data.loggingError} />
             <div>
                 {topSpan && (<Span span={topSpan} onClickLog={onClickLog} />)}
             </div>

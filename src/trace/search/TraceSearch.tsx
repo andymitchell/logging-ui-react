@@ -3,6 +3,7 @@ import { useMemo, type FC } from "react";
 import { useTraceResults } from "../data/useTraceResults.ts";
 import type { TracesSource } from "../types.ts";
 import { TraceSearchResultsList } from "./TraceSearchResultsList.tsx";
+import { SourceFailures } from "../common-components/SourceFailures.tsx";
 import type { TraceFilter } from "@andymitchell/logging/get-traces";
 
 interface TraceSearchProps {
@@ -20,7 +21,8 @@ interface TraceSearchProps {
  *
  * Loads from `tracesSource` whenever `query` or the source changes (a new object each time re-runs the search, so
  * memoise it), showing a loading or error line meanwhile. Each matching entry renders as a row, as in
- * {@link TraceSearchResultsList}.
+ * {@link TraceSearchResultsList}. When some log sources could not be read, it lists the matches the others
+ * returned and names the ones that failed.
  *
  * @example
  * const query = useMemo(() => ({ entries_filter: { type: 'error' } }), []);
@@ -32,7 +34,7 @@ export const TraceSearch: FC<TraceSearchProps> = ({
     onClick
 }) => {
 
-    const { data, loading, error } = useTraceResults(tracesSource, query, false);
+    const { data, loggingError, loading, error } = useTraceResults(tracesSource, query, false);
 
     const entries = useMemo(() => {
         if( data ) {
@@ -48,7 +50,8 @@ export const TraceSearch: FC<TraceSearchProps> = ({
         <div>
 
             {loading && <div>Loading...</div>}
-            {error && <div>Error: {error.message}</div>}
+            {error && <div data-container='load-error'>Error: {error.message}</div>}
+            <SourceFailures error={loggingError} />
 
             <TraceSearchResultsList entries={entries} onClick={onClick}/>
 
