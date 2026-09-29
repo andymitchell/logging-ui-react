@@ -41,7 +41,7 @@ describe('loading traces from a source', () => {
             const fromViewer = await getTracesFromSource(viewer);
             const fromFunction = await getTracesFromSource(asFunctionSource(viewer));
 
-            expect(fromViewer.map(trace => trace.logs[0]?.message)).toEqual(['Checkout', 'Login']);
+            expect(fromViewer.traces.map(trace => trace.logs[0]?.message)).toEqual(['Checkout', 'Login']);
             expect(fromFunction).toEqual(fromViewer);
         });
 
@@ -52,8 +52,8 @@ describe('loading traces from a source', () => {
             const fromViewer = await getTracesFromSource(viewer, errorsOnly);
             const fromFunction = await getTracesFromSource(asFunctionSource(viewer), errorsOnly);
 
-            expect(fromViewer.map(trace => trace.logs[0]?.message)).toEqual(['Checkout']);
-            expect(fromViewer[0]?.matches.map(entry => entry.message)).toEqual(['Card declined']);
+            expect(fromViewer.traces.map(trace => trace.logs[0]?.message)).toEqual(['Checkout']);
+            expect(fromViewer.traces[0]?.matches.map(entry => entry.message)).toEqual(['Card declined']);
             expect(fromFunction).toEqual(fromViewer);
         });
     });
@@ -61,7 +61,7 @@ describe('loading traces from a source', () => {
     it('returns every entry of a matching trace, not just the matching one', async () => {
         const viewer = new TraceViewer(await recordCheckoutThenLogin());
 
-        const [checkout] = await getTracesFromSource(viewer, { entries_filter: { type: 'error' } });
+        const { traces: [checkout] } = await getTracesFromSource(viewer, { entries_filter: { type: 'error' } });
 
         expect(checkout?.logs.map(entry => entry.message ?? entry.type)).toEqual([
             'Checkout', 'Cart loaded', 'Charge card', 'Card declined', 'event', 'event',

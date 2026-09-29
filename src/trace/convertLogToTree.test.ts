@@ -33,7 +33,7 @@ async function recordCheckout(): Promise<TraceResult> {
     await checkout.log('Showing error');
     await checkout.end();
 
-    const [trace] = await new TraceViewer(storage).getTraces();
+    const { traces: [trace] } = await new TraceViewer(storage).getTraces();
     if (!trace) throw new Error('Expected the checkout trace to be stored');
     return trace;
 }

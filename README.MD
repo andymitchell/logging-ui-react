@@ -14,7 +14,7 @@ All three peers are required:
 
 | Peer | Range |
 |---|---|
-| `@andymitchell/logging` | `>=0.13.0 <1.0.0` |
+| `@andymitchell/logging` | `>=0.14.0 <1.0.0` |
 | `react` | `^18.3.1 \|\| ^19.0.0` |
 | `react-json-view-lite` | `^2.4.1` |
 

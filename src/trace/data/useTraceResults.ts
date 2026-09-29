@@ -25,10 +25,10 @@ export function useTraceResults(
 
 
             try {
-                const data = await getTracesFromSource(source, query, includeAllTraceEntries);
+                const result = await getTracesFromSource(source, query, includeAllTraceEntries);
 
                 if( loadingIdRef.current!==loadingId ) return;
-                setData(data);
+                setData(result.traces);
             } catch(e) {
                 if( e instanceof Error ) setError(e);
             } finally {

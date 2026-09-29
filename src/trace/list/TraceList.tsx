@@ -30,10 +30,10 @@ export const TraceList: FC<TraceListProps> = ({
     useEffect(() => {
         let cancelled = false;
         (async () => {
-            const newEntries = await getTracesFromSource(tracesSource);
+            const result = await getTracesFromSource(tracesSource);
 
             if( cancelled ) return;
-            setTraces(newEntries);
+            setTraces(result.traces);
 
         })();
         return () => {
