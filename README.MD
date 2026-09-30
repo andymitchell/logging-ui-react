@@ -14,7 +14,7 @@ All three peers are required:
 
 | Peer | Range |
 |---|---|
-| `@andymitchell/logging` | `>=0.14.0 <1.0.0` |
+| `@andymitchell/logging` | `>=0.15.0 <1.0.0` |
 | `react` | `^18.3.1 \|\| ^19.0.0` |
 | `react-json-view-lite` | `^2.4.1` |
 
@@ -74,7 +74,7 @@ The components keep working when logging is failing, which is when you most need
 
 ## Upgrading to 0.3.0
 
-- **Requires `@andymitchell/logging` 0.14.0 or later.** From 0.14.0, `getTraces` resolves `{ ok, traces, error? }` instead of an array. Earlier versions of this package accept 0.14.0 as a peer, but fail at runtime against it. Upgrade both packages together.
+- **Requires `@andymitchell/logging` 0.15.0 or later.** From 0.15.0, `getTraces` resolves `{ ok, traces, error? }` instead of an array (0.14.0 still resolves an array). Earlier versions of this package accept 0.15.0 as a peer, but fail at runtime against it. Upgrade both packages together.
 - **A `GetTracesFn` must resolve `{ ok, traces, error? }`**, the same as `TraceViewer.getTraces`. A function that passes a viewer's answer through needs no change. One that builds an array itself returns `{ ok: true, traces }`.
 
 ## Requirements
