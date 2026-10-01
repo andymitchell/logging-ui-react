@@ -8,7 +8,7 @@ import type { TraceFilter } from "@andymitchell/logging/get-traces";
 
 interface TraceSearchProps {
     /**
-     * Either a TraceViewer object or a GetTracesFn
+     * Any `ITraceViewer` (e.g. a `TraceViewer`), or a `GetTracesFn`. See `TracesSource`.
      */
     tracesSource: TracesSource;
     query: TraceFilter,

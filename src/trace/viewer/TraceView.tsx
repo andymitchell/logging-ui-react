@@ -16,7 +16,7 @@ type TraceViewProps = BaseComponentTypes & {
     traceId: string,
 
     /**
-     * Either a TraceViewer object or a GetTracesFn
+     * Any `ITraceViewer` (e.g. a `TraceViewer`), or a `GetTracesFn`. See `TracesSource`.
      */
     tracesSource: TracesSource
 }

@@ -1,7 +1,8 @@
 import { MemoryLogStorage, Trace } from "@andymitchell/logging";
-import { TraceViewer, type TraceFilter } from "@andymitchell/logging/get-traces";
+import { TraceViewer, type ITraceViewer, type TraceFilter } from "@andymitchell/logging/get-traces";
 import type { GetTracesFn } from "../types.ts";
 import { getTracesFromSource } from "./getTracesFromSource.ts";
+import { sourceAnswering } from "../../testing/malformedSource.ts";
 import { UNREADABLE_SOURCE, viewerWithAnUnreadableSource } from "../../testing/unreadableSource.ts";
 
 /**
@@ -30,6 +31,14 @@ async function recordCheckoutThenLogin(): Promise<MemoryLogStorage> {
 /** A function source that answers from the same storage as the viewer. */
 function asFunctionSource(viewer: TraceViewer): GetTracesFn {
     return (filter, includeAllTraceEntries) => viewer.getTraces(filter, includeAllTraceEntries);
+}
+
+/**
+ * A viewer that is not a `TraceViewer` from this package's copy of logging (an app's own, or one from another
+ * installed copy), answering from the same storage as `viewer`.
+ */
+function asOtherViewer(viewer: TraceViewer): ITraceViewer {
+    return { getTraces: (filter, includeAllTraceEntries) => viewer.getTraces(filter, includeAllTraceEntries) };
 }
 
 describe('loading traces from a source', () => {
@@ -68,6 +77,32 @@ describe('loading traces from a source', () => {
             expect(fromViewer.traces.map(trace => trace.logs[0]?.message)).toEqual(['Checkout']);
             expect(fromViewer.error?.failures.map(failure => failure.source)).toEqual([UNREADABLE_SOURCE]);
             expect(fromFunction).toEqual(fromViewer);
+        });
+    });
+
+    it('takes any ITraceViewer, not only a TraceViewer from its own copy of logging, and gives the same results', async () => {
+        const viewer = new TraceViewer(await recordCheckoutThenLogin());
+
+        const fromViewer = await getTracesFromSource(viewer);
+        const fromOtherViewer = await getTracesFromSource(asOtherViewer(viewer));
+
+        expect(fromViewer.traces.map(trace => trace.logs[0]?.message)).toEqual(['Checkout', 'Login']);
+        expect(fromOtherViewer).toEqual(fromViewer);
+    });
+
+    describe('a source that answers with something other than { ok, traces }', () => {
+
+        const malformedAnswers: Array<[string, () => Promise<unknown>]> = [
+            ['a bare array of traces, as sources built for logging before 0.15 answer', async () => (await new TraceViewer(await recordCheckoutThenLogin()).getTraces()).traces],
+            ['nothing', async () => undefined],
+            ['a result without traces', async () => ({ ok: true })],
+            ['traces that are not a list', async () => ({ ok: true, traces: 'Checkout' })],
+        ];
+
+        it.each(malformedAnswers)('is refused, with a message saying what a source must answer, when it answers %s', async (_what, answer) => {
+            const source = sourceAnswering(await answer());
+
+            await expect(getTracesFromSource(source)).rejects.toThrow('{ ok, traces }');
         });
     });
 

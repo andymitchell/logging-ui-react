@@ -30,7 +30,7 @@ const viewer = new TraceViewer(new IDBLogStorage('my-app'));
 export const Traces = () => <TraceInspector tracesSource={viewer} template="neutral" />;
 ```
 
-`tracesSource` is either a `TraceViewer` or a function with the same signature as `TraceViewer.getTraces` (`GetTracesFn`), e.g. one that fetches traces from a server. Like `getTraces`, the function resolves `{ ok, traces, error? }`:
+`tracesSource` is any `ITraceViewer` (a `TraceViewer`, or one of your own), or a function with the same signature as `TraceViewer.getTraces` (`GetTracesFn`), e.g. one that fetches traces from a server. Like `getTraces`, the function resolves `{ ok, traces, error? }`:
 
 ```ts
 const fromServer: GetTracesFn = async (filter) =>
@@ -71,16 +71,18 @@ The components keep working when logging is failing, which is when you most need
 
 - **Some log sources can't be read** (e.g. a `ChannelsLogStorage` whose IndexedDB child is broken): the components show the traces the other sources returned, plus a notice naming the sources that failed (`data-container="source-failures"`).
 - **A function source throws or rejects** (e.g. the server is unreachable): the components show `Error: <message>` (`data-container="load-error"`) and keep what they last loaded.
+- **A source answers with something other than `{ ok, traces }`** (e.g. one built for logging before 0.15.0, which answers with an array): shown the same way, with a message saying what a source must answer.
 
-## Upgrading to 0.3.0
+## Upgrading to 0.4.0
 
-- **Requires `@andymitchell/logging` 0.15.0 or later.** From 0.15.0, `getTraces` resolves `{ ok, traces, error? }` instead of an array (0.14.0 still resolves an array). Earlier versions of this package accept 0.15.0 as a peer, but fail at runtime against it. Upgrade both packages together.
+- **Requires `@andymitchell/logging` 0.15.0 or later.** From 0.15.0, `getTraces` resolves `{ ok, traces, error? }` instead of an array (0.14.0 still resolves an array). Versions of this package before 0.4.0 accept 0.15.0 as a peer, but fail at runtime against it. Upgrade both packages together.
 - **A `GetTracesFn` must resolve `{ ok, traces, error? }`**, the same as `TraceViewer.getTraces`. A function that passes a viewer's answer through needs no change. One that builds an array itself returns `{ ok: true, traces }`.
+- **`tracesSource` takes any `ITraceViewer`**, not only a `TraceViewer`: a viewer of your own, or a `TraceViewer` from another installed copy of logging.
+- **Works with `@andymitchell/logging` 0.18.0.** Its entries carry `format_version`, which nothing here depends on. Fixtures of your own that build `LogEntry` literals need the field once you upgrade logging.
 
 ## Requirements
 
 - **A bundler that handles CSS imports.** `TraceView` imports `react-json-view-lite/dist/index.css`. Vite, webpack, Next.js, Parcel and esbuild (with a CSS loader) all do.
-- **One copy of `@andymitchell/logging`.** The components recognise a `TraceViewer` with `instanceof`, so it must come from the same copy this package resolves. Keeping logging a peer ensures this; check with `npm ls @andymitchell/logging`.
 - **`ref` needs React 19.** Components take `ref` as a plain prop. React 18 strips `ref` from function component props, so it's ignored there.
 
 ## Styling

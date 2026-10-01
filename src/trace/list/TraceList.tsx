@@ -14,7 +14,7 @@ import { SourceFailures } from "../common-components/SourceFailures.tsx";
 
 interface TraceListProps {
     /**
-     * Either a TraceViewer object or a GetTracesFn
+     * Any `ITraceViewer` (e.g. a `TraceViewer`), or a `GetTracesFn`. See `TracesSource`.
      */
     tracesSource: TracesSource;
     onClick?: (traceId:string) => void;

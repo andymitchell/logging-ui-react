@@ -21,7 +21,7 @@ type TraceInspectorProps = BaseComponentTypes & {
 
 
     /**
-     * Either a TraceViewer object or a GetTracesFn
+     * Any `ITraceViewer` (e.g. a `TraceViewer`), or a `GetTracesFn`. See `TracesSource`.
      */
     tracesSource: TracesSource;
 

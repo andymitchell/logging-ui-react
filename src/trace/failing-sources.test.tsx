@@ -2,6 +2,7 @@
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { TraceInspector, TraceSearch, TraceView, type GetTracesFn } from "../index.ts";
+import { sourceAnswering } from "../testing/malformedSource.ts";
 import { UNREADABLE_SOURCE, viewerWithAnUnreadableSource } from "../testing/unreadableSource.ts";
 
 /**
@@ -133,6 +134,35 @@ describe('components loading from a source that fails', () => {
                 await openListPane();
 
                 expect(textOf(container, 'load-error')).toEqual(['Error: Trace server unreachable']);
+                expect(unhandled).toEqual([]);
+            });
+        });
+    });
+
+    describe('when a function source answers with something other than { ok, traces }, says so and leaves nothing unhandled', () => {
+
+        const malformedSources: Array<[string, GetTracesFn]> = [
+            ['a bare array, as sources built for logging before 0.15 do', sourceAnswering([])],
+            ['nothing', sourceAnswering(undefined)],
+        ];
+
+        describe.each(malformedSources)('a source that answers %s', (_what, source) => {
+
+            it('a search', async () => {
+                const unhandled = recordUnhandledRejections();
+
+                await render(<TraceSearch tracesSource={source} query={{ entries_filter: { type: 'error' } }} />);
+
+                expect(textOf(container, 'load-error')).toEqual([expect.stringContaining('{ ok, traces }')]);
+                expect(unhandled).toEqual([]);
+            });
+
+            it('a single trace', async () => {
+                const unhandled = recordUnhandledRejections();
+
+                await render(<TraceView tracesSource={source} traceId="any-trace" />);
+
+                expect(textOf(container, 'load-error')).toEqual([expect.stringContaining('{ ok, traces }')]);
                 expect(unhandled).toEqual([]);
             });
         });
