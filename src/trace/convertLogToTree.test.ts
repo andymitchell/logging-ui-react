@@ -33,7 +33,7 @@ async function recordCheckout(): Promise<TraceResult> {
     await checkout.log('Showing error');
     await checkout.end();
 
-    const [trace] = await new TraceViewer(storage).getTraces();
+    const { traces: [trace] } = await new TraceViewer(storage).getTraces();
     if (!trace) throw new Error('Expected the checkout trace to be stored');
     return trace;
 }
@@ -111,8 +111,8 @@ async function recordAcrossStores(sentFrom: Array<'page' | 'sign in' | 'sign out
         await hop.end();
     }
     await page.end();
-    const pageEntries: LogEntry<any, SpanMeta>[] = await pageStorage.get();
-    const backgroundEntries: LogEntry<any, SpanMeta>[] = await backgroundStorage.get();
+    const pageEntries: LogEntry<any, SpanMeta>[] = (await pageStorage.get()).entries;
+    const backgroundEntries: LogEntry<any, SpanMeta>[] = (await backgroundStorage.get()).entries;
     return { page: pageEntries, background: backgroundEntries };
 }
 
@@ -162,7 +162,7 @@ describe('a trace that carried on in another log store', () => {
         await continueTrace(backgroundStorage, page.getFullId()).log('Logged on the attached span');
         await page.end();
 
-        const tree = convertLogToTree(await backgroundStorage.get());
+        const tree = convertLogToTree((await backgroundStorage.get()).entries);
 
         expect(tree && outline(tree)).toEqual({ message: ELSEWHERE, depth: 0, children: ['Logged on the attached span'] });
     });

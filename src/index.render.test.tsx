@@ -71,7 +71,7 @@ describe('the package entry\'s components render', () => {
         const trace = new Trace(storage, 'Import');
         await trace.log('Parsed 3 rows');
         await trace.warn('Skipped a blank row');
-        const [result] = await new TraceViewer(storage).getTraces();
+        const { traces: [result] } = await new TraceViewer(storage).getTraces();
         const entries = result?.logs ?? [];
 
         const html = renderToString(<TraceSearchResultsList entries={entries} />);
